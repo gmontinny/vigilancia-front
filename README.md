@@ -39,8 +39,12 @@ src/app/
 - ✅ Serviço de autenticação
 - ✅ Guards de rota
 - ✅ Lazy loading
-- ✅ Formulários reativos
-- ✅ Design responsivo
+- ✅ Formulários reativos com validação
+- ✅ Design responsivo baseado no template Xintra
+- ✅ Tela de login com alternância de background
+- ✅ Efeitos visuais (sombras e blur)
+- ✅ Toggle de visualização de senha
+- ✅ Fonte Poppins integrada
 
 ## 📋 Próximos Passos
 
