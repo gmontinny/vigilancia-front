@@ -1,59 +1,59 @@
-# VigilanciaFront
+# Sistema Vigilância - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+Sistema de vigilância desenvolvido em Angular seguindo boas práticas de arquitetura.
 
-## Development server
-
-To start a local development server, run:
+## 🚀 Início Rápido
 
 ```bash
-ng serve
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Acesse: `http://localhost:4200`
 
-## Code scaffolding
+## 🔐 Login
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+**Credenciais de teste:**
+- Usuário: `admin`
+- Senha: `123456`
+
+## 🏢 Arquitetura
+
+```
+src/app/
+├── core/                   # Serviços e guards singleton
+│   ├── services/
+│   │   └── auth.service.ts
+│   └── guards/
+│       └── auth.guard.ts
+├── features/               # Módulos por funcionalidade
+│   └── auth/login/
+├── shared/                 # Componentes reutilizáveis
+│   └── components/
+└── app.routes.ts           # Configuração de rotas
+```
+
+## 🛠️ Funcionalidades
+
+- ✅ Arquitetura modular (Core/Features/Shared)
+- ✅ Serviço de autenticação
+- ✅ Guards de rota
+- ✅ Lazy loading
+- ✅ Formulários reativos
+- ✅ Design responsivo
+
+## 📋 Próximos Passos
+
+1. Integrar com API do back-end
+2. Criar dashboard principal
+3. Implementar interceptors HTTP
+4. Adicionar tratamento de erros global
+
+## 🔧 Comandos
 
 ```bash
-ng generate component component-name
+ng serve              # Desenvolvimento
+ng build              # Produção
+ng test               # Testes
+ng generate component # Gerar componente
 ```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
