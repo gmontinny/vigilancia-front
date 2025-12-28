@@ -82,4 +82,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  goToResetPassword(event: Event): void {
+    event.preventDefault();
+    this.router.navigate(['/reset-password']);
+  }
 }

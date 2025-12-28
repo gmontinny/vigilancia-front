@@ -11,11 +11,16 @@ npm start
 
 Acesse: `http://localhost:4200`
 
-## 🔐 Login
+## 🔐 Autenticação
 
 **Credenciais de teste:**
 - Usuário: `admin`
 - Senha: `123456`
+
+**Funcionalidades:**
+- Login com validação de formulário
+- Reset de senha com validação completa
+- Navegação SPA entre telas
 
 ## 🏢 Arquitetura
 
@@ -27,24 +32,49 @@ src/app/
 │   └── guards/
 │       └── auth.guard.ts
 ├── features/               # Módulos por funcionalidade
-│   └── auth/login/
+│   └── auth/
+│       ├── login/          # Tela de login
+│       └── reset-password/ # Redefinição de senha
 ├── shared/                 # Componentes reutilizáveis
-│   └── components/
+│   ├── constants/          # Constantes do tema
+│   ├── validators/         # Validadores customizados
+│   └── styles/            # Estilos compartilhados
 └── app.routes.ts           # Configuração de rotas
 ```
 
 ## 🛠️ Funcionalidades
 
-- ✅ Arquitetura modular (Core/Features/Shared)
-- ✅ Serviço de autenticação
-- ✅ Guards de rota
-- ✅ Lazy loading
-- ✅ Formulários reativos com validação
-- ✅ Design responsivo baseado no template Xintra
-- ✅ Tela de login com alternância de background
-- ✅ Efeitos visuais (sombras e blur)
-- ✅ Toggle de visualização de senha
-- ✅ Fonte Poppins integrada
+### ✅ Autenticação
+- Tela de login com logo personalizado (150x142px)
+- Formulário de reset de senha completo
+- Validação de senhas (mínimo 6 caracteres)
+- Toggle de visualização de senha em todos os campos
+- Navegação SPA entre login e reset-password
+
+### ✅ Interface
+- Design responsivo baseado no template Xintra
+- Tema personalizado com cor primária #00A859
+- Background dinâmico (alternância a cada 10 segundos)
+- Efeitos visuais (sombras e blur)
+- Fonte Poppins integrada
+- Checkbox e links com cor do tema
+
+### ✅ Arquitetura
+- Arquitetura modular (Core/Features/Shared)
+- Componentes standalone
+- Formulários reativos com validação
+- Validadores customizados reutilizáveis
+- Constantes centralizadas
+- Estilos compartilhados
+- Guards de rota
+
+## 🎨 Customizações Visuais
+
+- **Logo**: Substituição da palavra "Vigilância" por imagem
+- **Cor primária**: #00A859 aplicada em botões e links
+- **Background**: Rotação automática entre 2 imagens
+- **Validações**: Mensagens padronizadas em português
+- **Responsividade**: Layout adaptável para diferentes telas
 
 ## 📋 Próximos Passos
 
@@ -52,6 +82,7 @@ src/app/
 2. Criar dashboard principal
 3. Implementar interceptors HTTP
 4. Adicionar tratamento de erros global
+5. Testes unitários
 
 ## 🔧 Comandos
 
