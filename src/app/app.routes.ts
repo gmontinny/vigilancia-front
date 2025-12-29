@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { ResetPasswordComponent } from './features/auth/reset-password/reset-password.component';
+import { NewPasswordComponent } from './features/auth/new-password/new-password.component';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,10 @@ export const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent
+  },
+  {
+    path: 'new-password',
+    component: NewPasswordComponent
   },
   {
     path: 'dashboard',

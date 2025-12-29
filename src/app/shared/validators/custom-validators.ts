@@ -6,9 +6,20 @@ export class CustomValidators {
       const password = control.get(passwordField);
       const confirmPassword = control.get(confirmPasswordField);
       
-      if (password && confirmPassword && password.value !== confirmPassword.value) {
-        confirmPassword.setErrors({ mismatch: true });
-        return { mismatch: true };
+      if (!password || !confirmPassword) {
+        return null;
+      }
+      
+      if (password.value !== confirmPassword.value) {
+        confirmPassword.setErrors({ passwordMismatch: true });
+        return { passwordMismatch: true };
+      }
+      
+      if (confirmPassword.hasError('passwordMismatch')) {
+        delete confirmPassword.errors!['passwordMismatch'];
+        if (Object.keys(confirmPassword.errors!).length === 0) {
+          confirmPassword.setErrors(null);
+        }
       }
       
       return null;

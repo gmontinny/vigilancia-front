@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  vigilancia-front-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_ENV: development
+    ports:
+      - "4200:80"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - vigilancia-network
+
+  vigilancia-front-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_ENV: production
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - vigilancia-network
+
+networks:
+  vigilancia-network:
+    driver: bridge
