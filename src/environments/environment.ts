@@ -8,6 +8,7 @@ export const environment = {
       resetPassword: '/api/auth/reset-password',
       newPassword: '/api/auth/new-password',
       refresh: '/api/auth/refresh'
-    }
+    },
+    usuarios: '/usuarios'
   }
 };

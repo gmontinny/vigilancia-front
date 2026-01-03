@@ -1,0 +1,243 @@
+<div class="container auth-container">
+  <div class="row justify-content-center align-items-center authentication authentication-basic h-100">
+    <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-8 col-sm-10 col-12">
+      <div class="card custom-card my-4">
+        <div class="card-body p-5">
+          <div class="mb-3 d-flex justify-content-center">
+            <img src="assets/images/logo_visa.png" alt="Vigilância" width="150" height="142" class="img-fluid">
+          </div>
+
+          <p class="h5 mb-2 text-center">Cadastro</p>
+          <p class="mb-4 text-muted op-7 fw-normal text-center">Crie sua conta no sistema de vigilância</p>
+
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+            @if(errorMessage) {
+              <p class="text-danger">{{ errorMessage }}</p>
+            }
+            @if(successMessage) {
+              <p class="text-success">{{ successMessage }}</p>
+            }
+
+            <div class="row gy-3">
+              <!-- Nome -->
+              <div class="col-xl-12">
+                <label for="nome" class="form-label text-default">
+                  Nome Completo <sup class="fs-12 text-danger">*</sup>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nome"
+                  placeholder="Digite seu nome completo"
+                  formControlName="nome"
+                  [class.is-invalid]="registerForm.get('nome')?.invalid && registerForm.get('nome')?.touched">
+                <div class="invalid-feedback">
+                  @if(registerForm.get('nome')?.errors?.['required']) {
+                    Nome é obrigatório
+                  }
+                  @if(registerForm.get('nome')?.errors?.['minlength']) {
+                    Nome deve ter pelo menos 3 caracteres
+                  }
+                </div>
+              </div>
+
+              <!-- CPF -->
+              <div class="col-xl-6">
+                <label for="cpf" class="form-label text-default">
+                  CPF <sup class="fs-12 text-danger">*</sup>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="cpf"
+                  placeholder="000.000.000-00"
+                  formControlName="cpf"
+                  mask="000.000.000-00"
+                  [class.is-invalid]="registerForm.get('cpf')?.invalid && registerForm.get('cpf')?.touched">
+                <div class="invalid-feedback">
+                  @if(registerForm.get('cpf')?.errors?.['required']) {
+                    CPF é obrigatório
+                  }
+                  @if(registerForm.get('cpf')?.errors?.['cpf']) {
+                    CPF inválido
+                  }
+                </div>
+              </div>
+
+              <!-- Celular -->
+              <div class="col-xl-6">
+                <label for="celular" class="form-label text-default">
+                  Celular <sup class="fs-12 text-danger">*</sup>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="celular"
+                  placeholder="(00) 90000-0000"
+                  formControlName="celular"
+                  mask="(00) 00000-0000"
+                  [class.is-invalid]="registerForm.get('celular')?.invalid && registerForm.get('celular')?.touched">
+                <div class="invalid-feedback">
+                  @if(registerForm.get('celular')?.errors?.['required']) {
+                    Celular é obrigatório
+                  }
+                  @if(registerForm.get('celular')?.errors?.['celular']) {
+                    Celular inválido
+                  }
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="col-xl-12">
+                <label for="email" class="form-label text-default">
+                  Email <sup class="fs-12 text-danger">*</sup>
+                </label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="Digite seu email"
+                  formControlName="email"
+                  [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+                <div class="invalid-feedback">
+                  @if(registerForm.get('email')?.errors?.['required']) {
+                    Email é obrigatório
+                  }
+                  @if(registerForm.get('email')?.errors?.['email']) {
+                    Email inválido
+                  }
+                </div>
+              </div>
+
+              <!-- Sexo -->
+              <div class="col-xl-12">
+                <label class="form-label text-default">
+                  Sexo <sup class="fs-12 text-danger">*</sup>
+                </label>
+                <div class="d-flex gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sexo" id="masculino" value="1" formControlName="sexo">
+                    <label class="form-check-label primary-text" for="masculino">Masculino</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sexo" id="feminino" value="2" formControlName="sexo">
+                    <label class="form-check-label primary-text" for="feminino">Feminino</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sexo" id="outros" value="3" formControlName="sexo">
+                    <label class="form-check-label primary-text" for="outros">Outros</label>
+                  </div>
+                </div>
+                @if(registerForm.get('sexo')?.invalid && registerForm.get('sexo')?.touched) {
+                  <div class="text-danger fs-12 mt-1">Sexo é obrigatório</div>
+                }
+              </div>
+
+              <!-- Imagem -->
+              <div class="col-xl-12">
+                <label for="imagem" class="form-label text-default">Foto de Perfil</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="imagem"
+                  accept="image/*"
+                  (change)="onImageSelected($event)">
+                @if(selectedImageName) {
+                  <small class="text-muted">Arquivo selecionado: {{ selectedImageName }}</small>
+                }
+              </div>
+
+              <!-- Senha -->
+              <div class="col-xl-6">
+                <label for="senha" class="form-label text-default">
+                  Senha <sup class="fs-12 text-danger">*</sup>
+                </label>
+                <div class="position-relative">
+                  <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    class="form-control create-password-input"
+                    id="senha"
+                    placeholder="Digite sua senha"
+                    formControlName="senha"
+                    [class.is-invalid]="registerForm.get('senha')?.invalid && registerForm.get('senha')?.touched">
+                  <a href="javascript:void(0);" class="show-password-button text-muted"
+                     (click)="togglePassword()">
+                    <i class="ri-eye-{{ showPassword ? 'off-' : '' }}line align-middle"></i>
+                  </a>
+                </div>
+                <div class="invalid-feedback">
+                  @if(registerForm.get('senha')?.errors?.['required']) {
+                    Senha é obrigatória
+                  }
+                  @if(registerForm.get('senha')?.errors?.['minlength']) {
+                    Senha deve ter pelo menos 6 caracteres
+                  }
+                </div>
+              </div>
+
+              <!-- Confirmar Senha -->
+              <div class="col-xl-6">
+                <label for="confirmSenha" class="form-label text-default">
+                  Confirmar Senha <sup class="fs-12 text-danger">*</sup>
+                </label>
+                <div class="position-relative">
+                  <input
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                    class="form-control create-password-input"
+                    id="confirmSenha"
+                    placeholder="Confirme sua senha"
+                    formControlName="confirmSenha"
+                    [class.is-invalid]="registerForm.get('confirmSenha')?.invalid && registerForm.get('confirmSenha')?.touched">
+                  <a href="javascript:void(0);" class="show-password-button text-muted"
+                     (click)="toggleConfirmPassword()">
+                    <i class="ri-eye-{{ showConfirmPassword ? 'off-' : '' }}line align-middle"></i>
+                  </a>
+                </div>
+                <div class="invalid-feedback">
+                  @if(registerForm.get('confirmSenha')?.errors?.['required']) {
+                    Confirmação de senha é obrigatória
+                  }
+                  @if(registerForm.get('confirmSenha')?.errors?.['passwordMismatch']) {
+                    As senhas não coincidem
+                  }
+                </div>
+              </div>
+
+              <!-- Termos -->
+              <div class="col-xl-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="termos" formControlName="termos">
+                  <label class="form-check-label primary-text" for="termos">
+                    Concordo com os <a href="#" class="primary-link">Termos de Uso</a> e <a href="#" class="primary-link">Política de Privacidade</a>
+                  </label>
+                </div>
+                @if(registerForm.get('termos')?.invalid && registerForm.get('termos')?.touched) {
+                  <div class="text-danger fs-12 mt-1">Você deve aceitar os termos</div>
+                }
+              </div>
+            </div>
+
+            <div class="d-grid mt-4">
+              <button
+                type="submit"
+                class="btn btn-primary primary-button"
+                [disabled]="!registerForm.valid || isLoading">
+                @if(isLoading) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                }
+                Criar Conta
+              </button>
+            </div>
+
+            <div class="text-center">
+              <p class="text-muted mt-3 mb-0">
+                Já tem uma conta?
+                <a href="#" (click)="goToLogin($event)" class="primary-link">Fazer Login</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

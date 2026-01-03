@@ -30,6 +30,7 @@ Acesse: `http://localhost:4200` (dev) ou `http://localhost` (prod)
 **Funcionalidades:**
 - Login com validação de formulário
 - Reset de senha com validação completa
+- **Cadastro de usuário** com upload de imagem
 - Navegação SPA entre telas
 
 ## 🏢 Arquitetura
@@ -38,7 +39,8 @@ Acesse: `http://localhost:4200` (dev) ou `http://localhost` (prod)
 src/app/
 ├── core/                   # Serviços e guards singleton
 │   ├── services/
-│   │   └── auth.service.ts
+│   │   ├── auth.service.ts
+│   │   └── usuario.service.ts
 │   ├── guards/
 │   │   └── auth.guard.ts
 │   ├── interfaces/         # Tipagem TypeScript
@@ -49,8 +51,11 @@ src/app/
 │   └── auth/
 │       ├── login/          # Tela de login
 │       ├── reset-password/ # Solicitação de reset
-│       └── new-password/   # Definição de nova senha
+│       ├── new-password/   # Definição de nova senha
+│       └── register/       # Cadastro de usuário
 ├── shared/                 # Componentes reutilizáveis
+│   ├── models/            # Interfaces e tipos
+│   │   └── usuario.model.ts
 │   ├── validators/         # Validadores customizados
 │   │   └── custom-validators.ts
 │   ├── constants/          # Constantes do tema
@@ -67,10 +72,20 @@ src/app/
 - Tela de login com logo personalizado (150x142px)
 - Formulário de reset de senha com validação de email
 - Formulário de nova senha com confirmação
+- **Cadastro de usuário** com validações brasileiras
 - Validador customizado para senhas coincidentes
 - Validação de senhas (mínimo 6 caracteres)
 - Toggle de visualização de senha em todos os campos
-- Navegação SPA entre login, reset e nova senha
+- Navegação SPA entre login, reset, nova senha e cadastro
+
+### ✅ Cadastro de Usuário
+- **Campos obrigatórios**: Nome, CPF, Email, Celular, Sexo, Senha
+- **Validações brasileiras**: CPF e celular com algoritmos específicos
+- **Upload de imagem**: Foto de perfil opcional para bucket MinIO
+- **Radio buttons**: Sexo (Masculino, Feminino, Outros)
+- **Status fixos**: Inativo (0) e Em avaliação (0)
+- **Integração multipart**: JSON + arquivo de imagem
+- **Modelos tipados**: Interfaces com enums para tipo-segurança
 
 ### ✅ Interface
 - Design responsivo baseado no template Xintra
@@ -113,6 +128,7 @@ src/app/
 - `/api/auth/reset-password` - Reset de senha
 - `/api/auth/new-password` - Nova senha
 - `/api/auth/refresh` - Refresh token
+- `/usuarios` - Cadastro de usuário (multipart)
 
 ## 🐳 Docker
 

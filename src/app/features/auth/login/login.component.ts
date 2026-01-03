@@ -87,4 +87,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     event.preventDefault();
     this.router.navigate(['/reset-password']);
   }
+
+  goToRegister(event: Event): void {
+    event.preventDefault();
+    this.router.navigate(['/register']);
+  }
 }
