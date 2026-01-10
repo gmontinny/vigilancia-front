@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CustomValidators } from '../../../shared/validators/custom-validators';
 import { FORM_VALIDATION } from '../../../shared/constants/theme.constants';
 import { UsuarioService } from '../../../core/services/usuario.service';
+import { RecaptchaService } from '../../../core/services/recaptcha.service';
 import { Usuario, CreateUsuarioRequest, SexoEnum, StatusEnum, TipoEnum } from '../../../shared/models/usuario.model';
 
 @Component({
@@ -31,6 +32,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private router: Router,
     private renderer: Renderer2,
     private usuarioService: UsuarioService,
+    private recaptchaService: RecaptchaService,
     @Inject(DOCUMENT) private document: Document
   ) {
     this.document.body.classList.add('authentication-background');
@@ -39,6 +41,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.startBackgroundRotation();
+    this.recaptchaService.loadRecaptcha().catch(error => {
+      console.error('Erro ao carregar reCAPTCHA:', error);
+    });
   }
 
   ngOnDestroy(): void {
@@ -46,6 +51,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     if (this.backgroundInterval) {
       clearInterval(this.backgroundInterval);
     }
+    // Remove o reCAPTCHA quando sair do componente de cadastro
+    this.recaptchaService.removeRecaptcha();
   }
 
   private initializeForm(): void {
@@ -95,38 +102,46 @@ export class RegisterComponent implements OnInit, OnDestroy {
       this.errorMessage = '';
       this.successMessage = '';
 
-      const formValue = this.registerForm.value;
-      
-      const usuario: Omit<Usuario, 'id'> = {
-        nome: formValue.nome,
-        cpf: formValue.cpf.replace(/\D/g, ''), // Remove formatação
-        email: formValue.email,
-        celular: formValue.celular.replace(/\D/g, ''), // Remove formatação
-        senha: formValue.senha,
-        sexo: parseInt(formValue.sexo),
-        status: StatusEnum.INATIVO, // Fixo como inativo
-        tipo: TipoEnum.EM_AVALIACAO, // Fixo como em avaliação
-        imagem: '' // Será preenchido pelo backend
-      };
+      // Executar reCAPTCHA antes de enviar o formulário
+      this.recaptchaService.executeRecaptcha('register').then(token => {
+        const formValue = this.registerForm.value;
+        
+        const usuario: Omit<Usuario, 'id'> = {
+          nome: formValue.nome,
+          cpf: formValue.cpf.replace(/\D/g, ''), // Remove formatação
+          email: formValue.email,
+          celular: formValue.celular.replace(/\D/g, ''), // Remove formatação
+          senha: formValue.senha,
+          sexo: parseInt(formValue.sexo),
+          status: StatusEnum.INATIVO, // Fixo como inativo
+          tipo: TipoEnum.EM_AVALIACAO, // Fixo como em avaliação
+          imagem: '' // Será preenchido pelo backend
+        };
 
-      const request: CreateUsuarioRequest = {
-        usuario,
-        imagem: this.selectedImage || undefined
-      };
+        const request: CreateUsuarioRequest = {
+          usuario,
+          imagem: this.selectedImage || undefined,
+          recaptchaToken: token
+        };
 
-      this.usuarioService.create(request).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          this.successMessage = 'Conta criada com sucesso! Redirecionando para o login...';
-          
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000);
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.errorMessage = error.error?.message || 'Erro ao criar conta. Tente novamente.';
-        }
+        this.usuarioService.create(request).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            this.successMessage = 'Conta criada com sucesso! Redirecionando para o login...';
+            
+            setTimeout(() => {
+              this.router.navigate(['/login']);
+            }, 2000);
+          },
+          error: (error) => {
+            this.isLoading = false;
+            this.errorMessage = error.error?.message || 'Erro ao criar conta. Tente novamente.';
+          }
+        });
+      }).catch(error => {
+        this.isLoading = false;
+        this.errorMessage = 'Erro na verificação de segurança. Tente novamente.';
+        console.error('Erro no reCAPTCHA:', error);
       });
     } else {
       Object.keys(this.registerForm.controls).forEach(key => {

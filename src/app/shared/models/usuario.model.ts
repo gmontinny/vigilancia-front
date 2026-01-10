@@ -14,6 +14,7 @@ export interface Usuario {
 export interface CreateUsuarioRequest {
   usuario: Omit<Usuario, 'id'>;
   imagem?: File;
+  recaptchaToken?: string;
 }
 
 export enum SexoEnum {

@@ -23,6 +23,11 @@ export class UsuarioService {
       formData.append('imagem', request.imagem);
     }
 
+    // Adiciona o token do reCAPTCHA se fornecido
+    if (request.recaptchaToken) {
+      formData.append('recaptchaToken', request.recaptchaToken);
+    }
+
     return this.http.post<Usuario>(this.apiUrl, formData);
   }
 }

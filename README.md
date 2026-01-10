@@ -30,7 +30,7 @@ Acesse: `http://localhost:4200` (dev) ou `http://localhost` (prod)
 **Funcionalidades:**
 - Login com validação de formulário
 - Reset de senha com validação completa
-- **Cadastro de usuário** com upload de imagem
+- **Cadastro de usuário** com upload de imagem e **reCAPTCHA v3**
 - Navegação SPA entre telas
 
 ## 🏢 Arquitetura
@@ -40,7 +40,8 @@ src/app/
 ├── core/                   # Serviços e guards singleton
 │   ├── services/
 │   │   ├── auth.service.ts
-│   │   └── usuario.service.ts
+│   │   ├── usuario.service.ts
+│   │   └── recaptcha.service.ts  # Serviço reCAPTCHA v3
 │   ├── guards/
 │   │   └── auth.guard.ts
 │   ├── interfaces/         # Tipagem TypeScript
@@ -86,6 +87,7 @@ src/app/
 - **Status fixos**: Inativo (0) e Em avaliação (0)
 - **Integração multipart**: JSON + arquivo de imagem
 - **Modelos tipados**: Interfaces com enums para tipo-segurança
+- **reCAPTCHA v3**: Proteção contra bots exclusiva do cadastro (carregamento/remoção dinâmica)
 
 ### ✅ Interface
 - Design responsivo baseado no template Xintra
@@ -128,7 +130,19 @@ src/app/
 - `/api/auth/reset-password` - Reset de senha
 - `/api/auth/new-password` - Nova senha
 - `/api/auth/refresh` - Refresh token
-- `/usuarios` - Cadastro de usuário (multipart)
+- `/usuarios` - Cadastro de usuário (multipart + reCAPTCHA)
+
+**Variáveis de Ambiente (.env):**
+```bash
+# reCAPTCHA Configuration
+RECAPTCHA_SITE_KEY=6LdiUkYsAAAAABSF2ik_27qRu-dfbK36KTLXGY0E
+RECAPTCHA_SECRET_KEY=6LdiUkYsAAAAAO_Ldv7R-n0M99FCB8PEz7jHCr0p
+```
+
+**Funcionalidades do reCAPTCHA:**
+- Carregamento dinâmico apenas no formulário de cadastro
+- Remoção completa ao sair do cadastro (script, badge, iframes, estilos)
+- Não interfere em outros formulários (login, reset de senha)
 
 ## 🐳 Docker
 
@@ -160,6 +174,9 @@ docker run -p 4200:80 vigilancia-front
 - **Separação**: Métodos privados e responsabilidades bem definidas
 - **Configuração**: Environments para diferentes ambientes
 - **Nomenclatura**: Nomes descritivos e padronizados
+- **Segurança**: reCAPTCHA v3 com variáveis de ambiente e limpeza completa
+- **Carregamento Assíncrono**: Scripts externos carregados dinamicamente
+- **Gestão de Memória**: Remoção completa de recursos não utilizados
 
 ## 📋 Próximos Passos
 
