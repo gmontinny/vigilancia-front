@@ -80,14 +80,13 @@ src/app/
 - Navegação SPA entre login, reset, nova senha e cadastro
 
 ### ✅ Cadastro de Usuário
-- **Campos obrigatórios**: Nome, CPF, Email, Celular, Sexo, Senha
-- **Validações brasileiras**: CPF e celular com algoritmos específicos
-- **Upload de imagem**: Foto de perfil opcional para bucket MinIO
+- **Campos obrigatórios**: Nome, CPF, Email, Celular, Sexo, Senha, Confirmar Senha
+- **Upload de imagem**: Foto de perfil opcional
 - **Radio buttons**: Sexo (Masculino, Feminino, Outros)
-- **Status fixos**: Inativo (0) e Em avaliação (0)
-- **Integração multipart**: JSON + arquivo de imagem
-- **Modelos tipados**: Interfaces com enums para tipo-segurança
-- **reCAPTCHA v3**: Proteção contra bots exclusiva do cadastro (carregamento/remoção dinâmica)
+- **Checkbox**: Aceitação de termos obrigatória
+- **Integração multipart**: FormData com JSON (dados) + arquivo (imagem)
+- **Endpoint**: POST `/auth/pre-cadastro` com MediaType.MULTIPART_FORM_DATA
+- **reCAPTCHA v3**: Proteção contra bots (carregamento/remoção dinâmica)
 
 ### ✅ Interface
 - Design responsivo baseado no template Xintra
@@ -130,7 +129,7 @@ src/app/
 - `/api/auth/reset-password` - Reset de senha
 - `/api/auth/new-password` - Nova senha
 - `/api/auth/refresh` - Refresh token
-- `/usuarios` - Cadastro de usuário (multipart + reCAPTCHA)
+- `/auth/pre-cadastro` - Pré-cadastro de usuário (multipart/form-data)
 
 **Variáveis de Ambiente (.env):**
 ```bash

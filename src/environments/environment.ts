@@ -10,7 +10,8 @@ export const environment = {
       login: '/api/auth/login',
       resetPassword: '/api/auth/reset-password',
       newPassword: '/api/auth/new-password',
-      refresh: '/api/auth/refresh'
+      refresh: '/api/auth/refresh',
+      preCadastro: '/auth/pre-cadastro'
     },
     usuarios: '/usuarios'
   }

@@ -177,27 +177,27 @@
 
               <!-- Confirmar Senha -->
               <div class="col-xl-6">
-                <label for="confirmSenha" class="form-label text-default">
+                <label for="confirmarSenha" class="form-label text-default">
                   Confirmar Senha <sup class="fs-12 text-danger">*</sup>
                 </label>
                 <div class="position-relative">
                   <input
                     [type]="showConfirmPassword ? 'text' : 'password'"
                     class="form-control create-password-input"
-                    id="confirmSenha"
+                    id="confirmarSenha"
                     placeholder="Confirme sua senha"
-                    formControlName="confirmSenha"
-                    [class.is-invalid]="registerForm.get('confirmSenha')?.invalid && registerForm.get('confirmSenha')?.touched">
+                    formControlName="confirmarSenha"
+                    [class.is-invalid]="registerForm.get('confirmarSenha')?.invalid && registerForm.get('confirmarSenha')?.touched">
                   <a href="javascript:void(0);" class="show-password-button text-muted"
                      (click)="toggleConfirmPassword()">
                     <i class="ri-eye-{{ showConfirmPassword ? 'off-' : '' }}line align-middle"></i>
                   </a>
                 </div>
                 <div class="invalid-feedback">
-                  @if(registerForm.get('confirmSenha')?.errors?.['required']) {
+                  @if(registerForm.get('confirmarSenha')?.errors?.['required']) {
                     Confirmação de senha é obrigatória
                   }
-                  @if(registerForm.get('confirmSenha')?.errors?.['passwordMismatch']) {
+                  @if(registerForm.get('confirmarSenha')?.errors?.['passwordMismatch']) {
                     As senhas não coincidem
                   }
                 </div>
