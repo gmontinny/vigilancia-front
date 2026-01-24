@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export interface LoginRequest {
   username: string;
@@ -20,6 +22,9 @@ export interface LoginResponse {
 })
 export class AuthService {
   private readonly STORAGE_KEY = 'auth_token';
+  private readonly apiUrl = environment.apiBaseUrl;
+
+  constructor(private readonly http: HttpClient) {}
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
     // Simulação - substituir por chamada HTTP real
@@ -31,6 +36,10 @@ export class AuthService {
       return of(response).pipe(delay(1500));
     }
     throw new Error('Credenciais inválidas');
+  }
+
+  preCadastro(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/pre-cadastro`, formData);
   }
 
   logout(): void {

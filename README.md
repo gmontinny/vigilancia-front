@@ -39,7 +39,7 @@ Acesse: `http://localhost:4200` (dev) ou `http://localhost` (prod)
 src/app/
 ├── core/                   # Serviços e guards singleton
 │   ├── services/
-│   │   ├── auth.service.ts
+│   │   ├── auth.service.ts      # Autenticação e pré-cadastro
 │   │   ├── usuario.service.ts
 │   │   └── recaptcha.service.ts  # Serviço reCAPTCHA v3
 │   ├── guards/
@@ -170,12 +170,20 @@ docker run -p 4200:80 vigilancia-front
 - **Tipagem Forte**: Interfaces TypeScript para todas as estruturas
 - **Constantes**: Eliminação de magic numbers e strings
 - **Validadores**: Classes reutilizáveis para validações customizadas
-- **Separação**: Métodos privados e responsabilidades bem definidas
+- **Separação de Responsabilidades**: Métodos privados com responsabilidade única
+- **Readonly Properties**: Dependências injetadas como readonly
+- **Early Return**: Validações no início dos métodos
+- **RxJS Operators**: Uso de finalize, catchError para gerenciamento de estado
+- **Service Layer**: Lógica HTTP centralizada em services
+- **DRY Principle**: Eliminação de código duplicado
+- **Encapsulamento**: Métodos privados para lógica interna
+- **Error Handling**: Tratamento de erros centralizado
 - **Configuração**: Environments para diferentes ambientes
 - **Nomenclatura**: Nomes descritivos e padronizados
 - **Segurança**: reCAPTCHA v3 com variáveis de ambiente e limpeza completa
 - **Carregamento Assíncrono**: Scripts externos carregados dinamicamente
 - **Gestão de Memória**: Remoção completa de recursos não utilizados
+- **SOLID Principles**: Single Responsibility, Dependency Injection
 
 ## 📋 Próximos Passos
 

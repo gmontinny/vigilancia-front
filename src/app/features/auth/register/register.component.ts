@@ -1,12 +1,13 @@
-import { Component, OnInit, OnDestroy, Renderer2, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { CustomValidators } from '../../../shared/validators/custom-validators';
 import { AUTH_CONSTANTS, VALIDATION_MESSAGES, ROUTES } from '../../../core/constants/auth.constants';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
 import { RecaptchaService } from '../../../core/services/recaptcha.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 interface PreCadastroDTO {
   nome: string;
@@ -40,12 +41,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
   readonly validationMessages = VALIDATION_MESSAGES;
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private http: HttpClient,
-    private recaptchaService: RecaptchaService,
-    private renderer: Renderer2,
-    @Inject(DOCUMENT) private document: Document
+    private readonly fb: FormBuilder,
+    private readonly router: Router,
+    private readonly authService: AuthService,
+    private readonly recaptchaService: RecaptchaService,
+    @Inject(DOCUMENT) private readonly document: Document
   ) {
     this.document.body.classList.add('authentication-background');
   }
@@ -53,20 +53,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.createForm();
     this.startBackgroundRotation();
-    this.recaptchaService.loadRecaptcha().catch(error => {
-      console.error('Erro ao carregar reCAPTCHA:', error);
-    });
+    this.loadRecaptcha();
   }
 
   ngOnDestroy(): void {
-    this.document.body.classList.remove('authentication-background');
-    if (this.backgroundInterval) {
-      clearInterval(this.backgroundInterval);
-    }
-    this.recaptchaService.removeRecaptcha();
+    this.cleanupResources();
   }
 
-  createForm(): void {
+  private createForm(): void {
     this.registerForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
       cpf: ['', [Validators.required]],
@@ -79,13 +73,64 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }, { validators: CustomValidators.passwordMatch('senha', 'confirmarSenha') });
   }
 
-  startBackgroundRotation(): void {
+  private startBackgroundRotation(): void {
     this.backgroundInterval = setInterval(() => {
       this.currentBackground = this.currentBackground === 1 ? 2 : 1;
       this.document.body.style.backgroundImage = `url('/assets/images/background-0${this.currentBackground}.png')`;
     }, AUTH_CONSTANTS.BACKGROUND_ROTATION_INTERVAL);
-    
+
     this.document.body.style.backgroundImage = `url('/assets/images/background-01.png')`;
+  }
+
+  private loadRecaptcha(): void {
+    this.recaptchaService.loadRecaptcha().catch(error => {
+      console.error('Erro ao carregar reCAPTCHA:', error);
+      this.errorMessage = 'Erro ao carregar sistema de segurança.';
+    });
+  }
+
+  private cleanupResources(): void {
+    this.document.body.classList.remove('authentication-background');
+    if (this.backgroundInterval) {
+      clearInterval(this.backgroundInterval);
+    }
+    this.recaptchaService.removeRecaptcha();
+  }
+
+  private buildPreCadastroDTO(): PreCadastroDTO {
+    const formValue = this.registerForm.value;
+    return {
+      nome: formValue.nome,
+      cpf: formValue.cpf,
+      celular: formValue.celular,
+      email: formValue.email,
+      sexo: parseInt(formValue.sexo),
+      senha: formValue.senha,
+      confirmarSenha: formValue.confirmarSenha
+    };
+  }
+
+  private buildFormData(preCadastroDTO: PreCadastroDTO): FormData {
+    const formData = new FormData();
+    formData.append('dados', new Blob([JSON.stringify(preCadastroDTO)], { type: 'application/json' }));
+
+    if (this.selectedImage) {
+      formData.append('imagem', this.selectedImage);
+    }
+
+    return formData;
+  }
+
+  private handleSuccess(): void {
+    this.successMessage = 'Conta criada com sucesso! Redirecionando para o login...';
+    setTimeout(() => {
+      this.router.navigate([ROUTES.LOGIN]);
+    }, AUTH_CONSTANTS.SUCCESS_REDIRECT_DELAY);
+  }
+
+  private handleError(error: any): void {
+    this.errorMessage = error?.error?.message || 'Erro ao criar conta. Tente novamente.';
+    console.error('Erro no cadastro:', error);
   }
 
   togglePassword(): void {
@@ -108,51 +153,39 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.registerForm.valid) {
-      this.isLoading = true;
-      this.errorMessage = '';
-      this.successMessage = '';
+    if (!this.registerForm.valid) {
+      this.markFormGroupTouched();
+      return;
+    }
 
-      this.recaptchaService.executeRecaptcha('register').then(token => {
-        const formData = new FormData();
-        
-        const preCadastroDTO: PreCadastroDTO = {
-          nome: this.registerForm.value.nome,
-          cpf: this.registerForm.value.cpf,
-          celular: this.registerForm.value.celular,
-          email: this.registerForm.value.email,
-          sexo: parseInt(this.registerForm.value.sexo),
-          senha: this.registerForm.value.senha,
-          confirmarSenha: this.registerForm.value.confirmarSenha
-        };
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
 
-        formData.append('dados', new Blob([JSON.stringify(preCadastroDTO)], { type: 'application/json' }));
-        
-        if (this.selectedImage) {
-          formData.append('imagem', this.selectedImage);
-        }
+    this.recaptchaService.executeRecaptcha('register')
+      .then(token => {
+        const preCadastroDTO = this.buildPreCadastroDTO();
+        const formData = this.buildFormData(preCadastroDTO);
 
-        this.http.post(`${environment.apiBaseUrl}/auth/pre-cadastro`, formData).subscribe({
-          next: () => {
-            this.isLoading = false;
-            this.successMessage = 'Conta criada com sucesso! Redirecionando para o login...';
-            setTimeout(() => {
-              this.router.navigate([ROUTES.LOGIN]);
-            }, AUTH_CONSTANTS.SUCCESS_REDIRECT_DELAY);
-          },
-          error: (error) => {
-            this.isLoading = false;
-            this.errorMessage = error.error?.message || 'Erro ao criar conta. Tente novamente.';
-          }
-        });
-      }).catch(error => {
+        this.authService.preCadastro(formData)
+          .pipe(
+            finalize(() => this.isLoading = false),
+            catchError(error => {
+              this.handleError(error);
+              return of(null);
+            })
+          )
+          .subscribe(response => {
+            if (response) {
+              this.handleSuccess();
+            }
+          });
+      })
+      .catch(error => {
         this.isLoading = false;
         this.errorMessage = 'Erro na verificação de segurança. Tente novamente.';
         console.error('Erro no reCAPTCHA:', error);
       });
-    } else {
-      this.markFormGroupTouched();
-    }
   }
 
   goToLogin(event: Event): void {
