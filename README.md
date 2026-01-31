@@ -59,6 +59,8 @@ src/app/
 │   │   └── usuario.model.ts
 │   ├── validators/         # Validadores customizados
 │   │   └── custom-validators.ts
+│   ├── directives/         # Diretivas reutilizáveis
+│   │   └── mask.directive.ts  # Máscaras CPF e Celular
 │   ├── constants/          # Constantes do tema
 │   └── styles/            # Estilos compartilhados
 ├── environments/           # Configurações de ambiente
@@ -81,6 +83,7 @@ src/app/
 
 ### ✅ Cadastro de Usuário
 - **Campos obrigatórios**: Nome, CPF, Email, Celular, Sexo, Senha, Confirmar Senha
+- **Máscaras automáticas**: CPF (000.000.000-00) e Celular ((00) 90000-0000)
 - **Upload de imagem**: Foto de perfil opcional
 - **Radio buttons**: Sexo (Masculino, Feminino, Outros)
 - **Checkbox**: Aceitação de termos obrigatória
@@ -101,6 +104,7 @@ src/app/
 - Componentes standalone
 - Formulários reativos com validação
 - Validadores customizados reutilizáveis
+- Diretivas customizadas (máscaras de input)
 - Interfaces TypeScript para tipagem forte
 - Constantes centralizadas (eliminação de magic numbers)
 - Configurações de ambiente (dev/prod)

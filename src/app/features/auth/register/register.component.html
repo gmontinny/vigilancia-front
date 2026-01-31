@@ -52,7 +52,7 @@
                   id="cpf"
                   placeholder="000.000.000-00"
                   formControlName="cpf"
-                  mask="000.000.000-00"
+                  cpfMask
                   [class.is-invalid]="registerForm.get('cpf')?.invalid && registerForm.get('cpf')?.touched">
                 <div class="invalid-feedback">
                   @if(registerForm.get('cpf')?.errors?.['required']) {
@@ -75,7 +75,7 @@
                   id="celular"
                   placeholder="(00) 90000-0000"
                   formControlName="celular"
-                  mask="(00) 00000-0000"
+                  celularMask
                   [class.is-invalid]="registerForm.get('celular')?.invalid && registerForm.get('celular')?.touched">
                 <div class="invalid-feedback">
                   @if(registerForm.get('celular')?.errors?.['required']) {

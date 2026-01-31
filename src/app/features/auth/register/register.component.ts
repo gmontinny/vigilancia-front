@@ -6,6 +6,7 @@ import { CustomValidators } from '../../../shared/validators/custom-validators';
 import { AUTH_CONSTANTS, VALIDATION_MESSAGES, ROUTES } from '../../../core/constants/auth.constants';
 import { RecaptchaService } from '../../../core/services/recaptcha.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CpfMaskDirective, CelularMaskDirective } from '../../../shared/directives/mask.directive';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
@@ -22,7 +23,7 @@ interface PreCadastroDTO {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, CpfMaskDirective, CelularMaskDirective],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })

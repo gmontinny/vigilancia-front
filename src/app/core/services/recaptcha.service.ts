@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
 
 declare const grecaptcha: any;
@@ -10,8 +11,15 @@ export class RecaptchaService {
   private readonly siteKey = environment.recaptcha.siteKey;
   private scriptElement: HTMLScriptElement | null = null;
 
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
   loadRecaptcha(): Promise<void> {
     return new Promise((resolve, reject) => {
+      if (!isPlatformBrowser(this.platformId)) {
+        resolve();
+        return;
+      }
+
       if (typeof grecaptcha !== 'undefined') {
         resolve();
         return;
@@ -27,6 +35,11 @@ export class RecaptchaService {
 
   executeRecaptcha(action: string): Promise<string> {
     return new Promise((resolve, reject) => {
+      if (!isPlatformBrowser(this.platformId)) {
+        resolve('test-token');
+        return;
+      }
+
       if (typeof grecaptcha === 'undefined') {
         reject(new Error('reCAPTCHA not loaded'));
         return;
@@ -43,13 +56,15 @@ export class RecaptchaService {
   }
 
   removeRecaptcha(): void {
-    // Remove o script do reCAPTCHA
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     if (this.scriptElement && this.scriptElement.parentNode) {
       this.scriptElement.parentNode.removeChild(this.scriptElement);
       this.scriptElement = null;
     }
     
-    // Remove todos os elementos do reCAPTCHA do DOM
     const recaptchaElements = document.querySelectorAll('[src*="recaptcha"], [src*="gstatic.com/recaptcha"], .grecaptcha-badge, iframe[src*="recaptcha"]');
     recaptchaElements.forEach(element => {
       if (element.parentNode) {
@@ -57,7 +72,6 @@ export class RecaptchaService {
       }
     });
     
-    // Remove estilos do reCAPTCHA
     const recaptchaStyles = document.querySelectorAll('style[nonce], link[href*="recaptcha"]');
     recaptchaStyles.forEach(style => {
       if (style.parentNode) {
@@ -65,7 +79,6 @@ export class RecaptchaService {
       }
     });
     
-    // Remove o objeto grecaptcha do window
     if (typeof window !== 'undefined' && (window as any).grecaptcha) {
       delete (window as any).grecaptcha;
     }
