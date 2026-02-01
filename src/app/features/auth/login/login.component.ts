@@ -67,9 +67,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       const credentials = this.loginForm.value;
 
       this.authService.login(credentials).subscribe({
-        next: (response) => {
-          this.authService.setToken(response.token);
-          this.router.navigate(['/dashboard']);
+        next: async (response) => {
+          await this.router.navigate(['/dashboard']);
         },
         error: () => {
           this.errorMessage = 'Usuário ou senha inválidos';

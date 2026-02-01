@@ -41,13 +41,17 @@ src/app/
 │   ├── services/
 │   │   ├── auth.service.ts      # Autenticação e pré-cadastro
 │   │   ├── usuario.service.ts
-│   │   └── recaptcha.service.ts  # Serviço reCAPTCHA v3
+│   │   ├── recaptcha.service.ts  # Serviço reCAPTCHA v3
+│   │   ├── storage.service.ts    # Persistência localStorage/IndexedDB
+│   │   ├── preferences.service.ts # Preferências do usuário
+│   │   └── form-draft.service.ts  # Rascunhos de formulários
 │   ├── guards/
 │   │   └── auth.guard.ts
 │   ├── interfaces/         # Tipagem TypeScript
 │   │   └── auth.interface.ts
 │   └── constants/          # Constantes da aplicação
-│       └── auth.constants.ts
+│       ├── auth.constants.ts
+│       └── storage.constants.ts  # Chaves e TTL de storage
 ├── features/               # Módulos por funcionalidade
 │   └── auth/
 │       ├── login/          # Tela de login
@@ -110,6 +114,8 @@ src/app/
 - Configurações de ambiente (dev/prod)
 - Guards de rota
 - Separação de responsabilidades
+- **Persistência seletiva**: localStorage para tokens, IndexedDB para dados complexos
+- **Gestão de estado**: TTL automático, preferências e rascunhos de formulários
 
 ## 🎨 Customizações Visuais
 
@@ -146,6 +152,24 @@ RECAPTCHA_SECRET_KEY=6LdiUkYsAAAAAO_Ldv7R-n0M99FCB8PEz7jHCr0p
 - Carregamento dinâmico apenas no formulário de cadastro
 - Remoção completa ao sair do cadastro (script, badge, iframes, estilos)
 - Não interfere em outros formulários (login, reset de senha)
+
+## 💾 Persistência de Dados
+
+**StorageService - Abstração unificada:**
+- **localStorage**: Tokens de autenticação, preferências, rascunhos
+- **sessionStorage**: Dados temporários da sessão
+- **IndexedDB**: Dados complexos do usuário
+
+**Funcionalidades:**
+- TTL automático (expiração de dados)
+- Limpeza automática de dados expirados
+- Serialização/desserialização automática
+- Suporte a tipos genéricos TypeScript
+
+**Serviços especializados:**
+- **PreferencesService**: Tema, idioma, notificações
+- **FormDraftService**: Salvamento automático de formulários (TTL: 1 dia)
+- **AuthService**: Token (TTL: 1 semana), dados do usuário (IndexedDB)
 
 ## 🐳 Docker
 
@@ -187,6 +211,9 @@ docker run -p 4200:80 vigilancia-front
 - **Segurança**: reCAPTCHA v3 com variáveis de ambiente e limpeza completa
 - **Carregamento Assíncrono**: Scripts externos carregados dinamicamente
 - **Gestão de Memória**: Remoção completa de recursos não utilizados
+- **Persistência Inteligente**: localStorage/IndexedDB com TTL e limpeza automática
+- **Storage Service**: Abstração unificada para diferentes tipos de armazenamento
+- **State Management**: Preferências e rascunhos persistidos entre sessões
 - **SOLID Principles**: Single Responsibility, Dependency Injection
 
 ## 📋 Próximos Passos
