@@ -6,9 +6,11 @@ Sistema de vigilância desenvolvido em Angular seguindo boas práticas de arquit
 
 ### Desenvolvimento Local
 ```bash
-npm install
+npm install --legacy-peer-deps
 npm start
 ```
+
+**Nota:** O flag `--legacy-peer-deps` é necessário devido à incompatibilidade de versão entre Angular 21 e NgRx 19.
 
 ### Docker (Recomendado)
 ```bash
@@ -46,15 +48,27 @@ src/app/
 │   │   ├── preferences.service.ts # Preferências do usuário
 │   │   └── form-draft.service.ts  # Rascunhos de formulários
 │   ├── guards/
-│   │   └── auth.guard.ts
+│   │   └── auth.guard.ts         # Guard com NgRx selectors
 │   ├── interfaces/         # Tipagem TypeScript
 │   │   └── auth.interface.ts
+│   ├── types/              # TypeScript Avançado
+│   │   └── advanced.types.ts     # Template literals, discriminated unions
 │   └── constants/          # Constantes da aplicação
 │       ├── auth.constants.ts
 │       └── storage.constants.ts  # Chaves e TTL de storage
+├── store/                  # NgRx State Management
+│   ├── app.state.ts        # Estado global da aplicação
+│   ├── index.ts            # Barrel exports
+│   └── auth/               # Feature: Autenticação
+│       ├── auth.state.ts   # Estado do módulo auth
+│       ├── auth.actions.ts # Actions (login, logout, etc.)
+│       ├── auth.reducer.ts # Reducer para atualizar estado
+│       ├── auth.effects.ts # Effects com inject() moderno
+│       ├── auth.selectors.ts # Selectors memoizados
+│       └── index.ts        # Barrel exports
 ├── features/               # Módulos por funcionalidade
 │   └── auth/
-│       ├── login/          # Tela de login
+│       ├── login/          # Tela de login com NgRx
 │       ├── reset-password/ # Solicitação de reset
 │       ├── new-password/   # Definição de nova senha
 │       └── register/       # Cadastro de usuário
@@ -105,18 +119,23 @@ src/app/
 - Checkbox e links com cor do tema
 
 ### ✅ Arquitetura
-- Arquitetura modular (Core/Features/Shared)
+- Arquitetura modular (Core/Features/Shared/Store)
 - Componentes standalone
+- **NgRx State Management**: Store global com actions, reducers, effects e selectors
+- **Redux DevTools**: Debug com time-travel e inspeção de estado
+- **Client-Side Rendering**: SSR desabilitado para compatibilidade com IndexedDB/localStorage
+- **Injeção Moderna**: Effects usam `inject()` ao invés de constructor
 - Formulários reativos com validação
 - Validadores customizados reutilizáveis
 - Diretivas customizadas (máscaras de input)
 - Interfaces TypeScript para tipagem forte
+- **TypeScript Avançado**: Template literals, discriminated unions, variadic tuples
 - Constantes centralizadas (eliminação de magic numbers)
 - Configurações de ambiente (dev/prod)
-- Guards de rota
+- Guards de rota com NgRx selectors
 - Separação de responsabilidades
 - **Persistência seletiva**: localStorage para tokens, IndexedDB para dados complexos
-- **Gestão de estado**: TTL automático, preferências e rascunhos de formulários
+- **Gestão de estado centralizada**: NgRx para estado global reativo
 
 ## 🎨 Customizações Visuais
 
@@ -183,6 +202,59 @@ RECAPTCHA_SECRET_KEY=6LdiUkYsAAAAAO_Ldv7R-n0M99FCB8PEz7jHCr0p
 - Proteção contra bots e ataques automatizados
 - Não interfere no formulário de login
 
+## 🏪 NgRx State Management
+
+**Gerenciamento de Estado Centralizado:**
+- **Store Global**: Estado reativo e previsível
+- **Actions**: Eventos tipados para todas as mudanças
+- **Reducers**: Funções puras para atualizar estado
+- **Effects**: Side effects isolados (HTTP, storage, navegação)
+- **Selectors**: Queries memoizadas para performance
+- **Injeção Moderna**: Effects usam `inject()` do Angular
+
+**Features Implementadas:**
+- ✅ **Auth Store**: Login, logout, persistência de sessão
+- ✅ **DevTools**: Redux DevTools para debug
+- ✅ **Async Pipe**: Gerenciamento automático de subscriptions
+- ✅ **Type Safety**: Tipagem forte em todo o fluxo
+- ✅ **CSR Only**: Client-Side Rendering para compatibilidade com storage APIs
+
+**Documentação Completa:**
+- Veja [docs/NGRX.md](docs/NGRX.md) para guia completo de uso
+
+**Por que NgRx neste projeto?**
+- Sistema de grande porte (150+ entidades no backend)
+- Múltiplos módulos interconectados
+- Cache centralizado para evitar requisições duplicadas
+- Auditoria de ações para compliance governamental
+- Performance com seletores memoizados
+
+## 🎯 TypeScript Avançado
+
+**Tipagem Avançada Implementada:**
+- **Template Literal Types**: Rotas e eventos tipados
+- **Discriminated Unions**: API responses com type narrowing
+- **Variadic Tuple Types**: Paginação tipada
+- **Conditional Types**: Campos obrigatórios condicionais
+- **Mapped Types**: Form errors automáticos
+- **Utility Types**: DeepPartial, DeepReadonly
+
+**Geração Automática de Tipos:**
+```bash
+npm run generate:api-types
+```
+Gera tipos TypeScript do Swagger: `http://localhost:8081/v3/api-docs`
+
+**Strictness Configurado:**
+- ✅ `strict: true` (noImplicitAny, strictNullChecks)
+- ✅ `noImplicitReturns`
+- ✅ `noFallthroughCasesInSwitch`
+- ✅ `strictInjectionParameters`
+- ✅ `strictTemplates`
+
+**Documentação Completa:**
+- Veja [docs/TYPESCRIPT.md](docs/TYPESCRIPT.md) para exemplos e guia completo
+
 ## 💾 Persistência de Dados
 
 **StorageService - Abstração unificada:**
@@ -200,6 +272,26 @@ RECAPTCHA_SECRET_KEY=6LdiUkYsAAAAAO_Ldv7R-n0M99FCB8PEz7jHCr0p
 - **PreferencesService**: Tema, idioma, notificações
 - **FormDraftService**: Salvamento automático de formulários (TTL: 1 dia)
 - **AuthService**: Token (TTL: 1 semana), dados do usuário (IndexedDB)
+
+## ⚙️ Configurações Técnicas
+
+**Rendering:**
+- **CSR (Client-Side Rendering)**: SSR desabilitado
+- **Motivo**: Compatibilidade com IndexedDB, localStorage e reCAPTCHA
+- **Benefício**: Desenvolvimento simplificado para sistema administrativo
+
+**Injeção de Dependências:**
+- **Padrão Moderno**: `inject()` function-based
+- **Usado em**: Effects, Guards, Services
+- **Benefício**: Melhor compatibilidade com standalone APIs
+
+**Versões:**
+- Angular: 21.0.0
+- NgRx: 19.0.0 (com --legacy-peer-deps)
+- TypeScript: 5.9.2
+- RxJS: 7.8.0
+
+## 🐳 DockerDB)
 
 ## 🐳 Docker
 
@@ -238,6 +330,15 @@ docker run -p 4200:80 vigilancia-front
 ## 📝 Boas Práticas Implementadas
 
 - **Tipagem Forte**: Interfaces TypeScript para todas as estruturas
+- **TypeScript Avançado**: Template literals, discriminated unions, variadic tuples
+- **Geração Automática**: Tipos gerados do Swagger/OpenAPI via openapi-typescript
+- **Strictness Total**: noImplicitAny, strictNullChecks, noImplicitReturns habilitados
+- **NgRx Store**: Gerenciamento de estado centralizado e reativo
+- **Injeção Moderna**: inject() ao invés de constructor
+- **CSR Only**: Client-Side Rendering para compatibilidade com storage APIs
+- **Immutability**: Estado imutável com reducers puros
+- **Memoization**: Selectors memoizados para performance
+- **Effects**: Side effects isolados e testáveis
 - **Constantes**: Eliminação de magic numbers e strings
 - **Validadores**: Classes reutilizáveis para validações customizadas
 - **Separação de Responsabilidades**: Métodos privados com responsabilidade única
@@ -255,16 +356,20 @@ docker run -p 4200:80 vigilancia-front
 - **Gestão de Memória**: Remoção completa de recursos não utilizados
 - **Persistência Inteligente**: localStorage/IndexedDB com TTL e limpeza automática
 - **Storage Service**: Abstração unificada para diferentes tipos de armazenamento
-- **State Management**: Preferências e rascunhos persistidos entre sessões
+- **State Management**: NgRx com actions, reducers, effects e selectors
 - **SOLID Principles**: Single Responsibility, Dependency Injection
 
 ## 📋 Próximos Passos
 
-1. Integrar com API do back-end
+1. Implementar stores NgRx para features principais:
+   - Estabelecimentos Store (CRUD + cache)
+   - Licenciamento Store (workflow + tramitações)
+   - Fiscalização Store (atividades + autos)
+   - Processos Store (administrativos + timeline)
 2. Criar dashboard principal
-3. Implementar interceptors HTTP
+3. Implementar interceptors HTTP com token do store
 4. Adicionar tratamento de erros global
-5. Testes unitários
+5. Testes unitários (reducers, effects, selectors)
 
 ## 🔧 Comandos
 

@@ -11,7 +11,7 @@
           <p class="mb-4 text-muted op-7 fw-normal text-center">Acesse o sistema de vigilância</p>
 
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            @if(errorMessage) {
+            @if(errorMessage$ | async; as errorMessage) {
               <p class="text-danger">{{ errorMessage }}</p>
             }
 
@@ -78,8 +78,8 @@
                 type="submit"
                 class="btn btn-primary"
                 style="background: #00A859 !important; border-color: #00A859 !important; background-image: none !important;"
-                [disabled]="!loginForm.valid || isLoading">
-                @if(isLoading) {
+                [disabled]="!loginForm.valid || (isLoading$ | async)">
+                @if(isLoading$ | async) {
                   <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                 }
                 Entrar

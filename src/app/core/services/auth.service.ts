@@ -5,19 +5,7 @@ import { delay, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { StorageService, StorageType } from './storage.service';
 import { STORAGE_KEYS, STORAGE_TTL } from '../constants/storage.constants';
-
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    username: string;
-  };
-}
+import { LoginRequest, LoginResponse, User } from '../interfaces/auth.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -33,9 +21,17 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<LoginResponse> {
     // Simulação - substituir por chamada HTTP real
     if (credentials.username === 'admin' && credentials.password === '123456') {
+      const user: User = {
+        id: 1,
+        username: credentials.username,
+        nome: 'Administrador',
+        email: 'admin@vigilancia.com.br',
+        roles: ['ADMIN']
+      };
       const response: LoginResponse = {
         token: 'fake-jwt-token',
-        user: { id: '1', username: credentials.username }
+        refreshToken: 'fake-refresh-token',
+        user
       };
       return of(response).pipe(
         delay(1500),
@@ -73,11 +69,11 @@ export class AuthService {
     });
   }
 
-  async getUserData(): Promise<any> {
-    return await this.storageService.get(STORAGE_KEYS.USER_DATA, StorageType.INDEXED_DB);
+  async getUserData(): Promise<User | null> {
+    return await this.storageService.get<User>(STORAGE_KEYS.USER_DATA, StorageType.INDEXED_DB);
   }
 
-  async setUserData(user: any): Promise<void> {
+  async setUserData(user: User): Promise<void> {
     await this.storageService.set(STORAGE_KEYS.USER_DATA, user, {
       type: StorageType.INDEXED_DB,
       ttl: STORAGE_TTL.ONE_WEEK
