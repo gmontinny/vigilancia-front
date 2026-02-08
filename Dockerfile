@@ -15,6 +15,11 @@ COPY . .
 
 # Argumento para definir ambiente de build
 ARG BUILD_ENV=production
+ARG API_BASE_URL=http://localhost:8081
+ARG RECAPTCHA_SITE_KEY=
+
+# Criar arquivo de ambiente para build
+RUN echo "export const environment = { production: ${BUILD_ENV} === 'production', apiBaseUrl: '${API_BASE_URL}', recaptcha: { siteKey: '${RECAPTCHA_SITE_KEY}' } };" > /app/src/environments/environment.ts
 
 # Build da aplicação baseado no ambiente
 RUN if [ "$BUILD_ENV" = "development" ] ; then npm run build ; else npm run build --prod ; fi
