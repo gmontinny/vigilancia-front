@@ -16,7 +16,7 @@ COPY . .
 # Argumento para definir ambiente de build
 ARG BUILD_ENV=production
 ARG API_BASE_URL=http://localhost:8081
-ARG RECAPTCHA_SITE_KEY=
+ARG RECAPTCHA_SITE_KEY=6LdiUkYsAAAAABSF2ik_27qRu-dfbK36KTLXGY0E
 
 # Criar arquivo de ambiente para build
 RUN echo "export const environment = { production: ${BUILD_ENV} === 'production', apiBaseUrl: '${API_BASE_URL}', recaptcha: { siteKey: '${RECAPTCHA_SITE_KEY}' } };" > /app/src/environments/environment.ts

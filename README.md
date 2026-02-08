@@ -157,6 +157,21 @@ src/app/
 
 **Variáveis de Ambiente (.env):**
 ```bash
+# Backend Configuration
+API_BASE_URL=http://localhost:8081
+API_TIMEOUT=30000
+
+# Environment
+NODE_ENV=development
+
+# API Endpoints
+API_AUTH_LOGIN=/api/auth/login
+API_AUTH_FORGOT_PASSWORD=/auth/password/forgot
+API_AUTH_NEW_PASSWORD=/api/auth/new-password
+API_AUTH_REFRESH=/api/auth/refresh
+API_AUTH_PRE_CADASTRO=/auth/pre-cadastro
+API_USUARIOS=/usuarios
+
 # reCAPTCHA Configuration
 RECAPTCHA_SITE_KEY=6LdiUkYsAAAAABSF2ik_27qRu-dfbK36KTLXGY0E
 RECAPTCHA_SECRET_KEY=6LdiUkYsAAAAAO_Ldv7R-n0M99FCB8PEz7jHCr0p
@@ -192,8 +207,16 @@ RECAPTCHA_SECRET_KEY=6LdiUkYsAAAAAO_Ldv7R-n0M99FCB8PEz7jHCr0p
 - Build otimizado com Node.js 18 Alpine
 - Nginx para servir arquivos estáticos
 - Suporte a diferentes ambientes via `BUILD_ENV`
+- **Injeção de variáveis**: API_BASE_URL e RECAPTCHA_SITE_KEY via build args
+- **Geração dinâmica**: environment.ts criado durante build com variáveis
 
-**Configurações:**
+**docker-compose.yml:**
+- **env_file**: Carrega variáveis do .env automaticamente
+- **Build args**: Passa API_BASE_URL e RECAPTCHA_SITE_KEY para Dockerfile
+- **Ambientes separados**: Dev (porta 4200) e Prod (porta 80)
+- **Produção**: URL hardcoded para `https://api.vigilancia.com.br`
+
+**Configurações Nginx:**
 - SPA routing com try_files
 - Cache para assets estáticos
 - Headers de segurança
@@ -201,8 +224,12 @@ RECAPTCHA_SECRET_KEY=6LdiUkYsAAAAAO_Ldv7R-n0M99FCB8PEz7jHCr0p
 
 **Comandos:**
 ```bash
-# Build manual
-docker build --build-arg BUILD_ENV=development -t vigilancia-front .
+# Build manual com variáveis
+docker build \
+  --build-arg BUILD_ENV=development \
+  --build-arg API_BASE_URL=http://localhost:8081 \
+  --build-arg RECAPTCHA_SITE_KEY=6LdiUkYsAAAAABSF2ik_27qRu-dfbK36KTLXGY0E \
+  -t vigilancia-front .
 
 # Executar container
 docker run -p 4200:80 vigilancia-front
@@ -251,20 +278,19 @@ ng generate component # Gerar componente
 
 ### Docker
 ```bash
-# Desenvolvimento
+# Desenvolvimento (carrega .env automaticamente)
 docker-compose up vigilancia-front-dev
 
-# Produção
+# Produção (usa URL de produção)
 docker-compose up vigilancia-front-prod
 
-# Build customizado
-docker build --build-arg BUILD_ENV=production -t vigilancia-front .
-```lvimento
-docker-compose up vigilancia-front-dev
+# Build customizado com variáveis
+docker build \
+  --build-arg BUILD_ENV=production \
+  --build-arg API_BASE_URL=https://api.vigilancia.com.br \
+  --build-arg RECAPTCHA_SITE_KEY=YOUR_KEY \
+  -t vigilancia-front .
 
-# Produção
-docker-compose up vigilancia-front-prod
-
-# Build customizado
-docker build --build-arg BUILD_ENV=production -t vigilancia-front .
+# Rebuild forçado
+docker-compose up --build vigilancia-front-dev
 ```
