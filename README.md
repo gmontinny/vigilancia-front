@@ -77,13 +77,14 @@ src/app/
 
 ### ✅ Autenticação
 - Tela de login com logo personalizado (150x142px)
-- Formulário de reset de senha com validação de email
-- Formulário de nova senha com confirmação
-- **Cadastro de usuário** com validações brasileiras
+- **Formulário de reset de senha**: Solicita link por email com reCAPTCHA v3 (sempre retorna 200)
+- **Formulário de nova senha**: Recebe token via query param, valida e redefine senha
+- **Cadastro de usuário** com validações brasileiras e reCAPTCHA v3
 - Validador customizado para senhas coincidentes
 - Validação de senhas (mínimo 6 caracteres)
 - Toggle de visualização de senha em todos os campos
 - Navegação SPA entre login, reset, nova senha e cadastro
+- Validação de token antes do envio (new-password)
 
 ### ✅ Cadastro de Usuário
 - **Campos obrigatórios**: Nome, CPF, Email, Celular, Sexo, Senha, Confirmar Senha
@@ -136,10 +137,23 @@ src/app/
 
 **Endpoints configurados:**
 - `/api/auth/login` - Autenticação
-- `/api/auth/reset-password` - Reset de senha
-- `/api/auth/new-password` - Nova senha
+- `/auth/password/forgot` - Solicitação de reset (POST: `{email}`, sempre retorna 200)
+- `/auth/password/reset` - Redefinição de senha (POST: `{token, novaSenha}`)
 - `/api/auth/refresh` - Refresh token
 - `/auth/pre-cadastro` - Pré-cadastro de usuário (multipart/form-data)
+
+**Fluxo de Reset de Senha:**
+1. Usuário informa email em `/reset-password`
+2. Frontend executa reCAPTCHA v3 (action: `forgot_password`)
+3. Frontend envia POST para `/auth/password/forgot` com `{email}`
+4. Backend envia email com link: `http://localhost:4200/new-password?token=TOKEN`
+5. Usuário clica no link e é redirecionado para `/new-password`
+6. Formulário captura token da URL via `ActivatedRoute.queryParams`
+7. Validação: Se token não existe, exibe mensagem de erro
+8. Usuário informa nova senha e confirmação
+9. Frontend envia POST para `/auth/password/reset` com `{token, novaSenha}`
+10. Backend valida token (válido por 2 horas) e atualiza senha
+11. Usuário é redirecionado para `/login` com mensagem de sucesso
 
 **Variáveis de Ambiente (.env):**
 ```bash
@@ -149,9 +163,10 @@ RECAPTCHA_SECRET_KEY=6LdiUkYsAAAAAO_Ldv7R-n0M99FCB8PEz7jHCr0p
 ```
 
 **Funcionalidades do reCAPTCHA:**
-- Carregamento dinâmico apenas no formulário de cadastro
-- Remoção completa ao sair do cadastro (script, badge, iframes, estilos)
-- Não interfere em outros formulários (login, reset de senha)
+- Carregamento dinâmico nos formulários de cadastro e reset de senha
+- Remoção completa ao sair dos componentes (script, badge, iframes, estilos)
+- Proteção contra bots e ataques automatizados
+- Não interfere no formulário de login
 
 ## 💾 Persistência de Dados
 
@@ -237,6 +252,14 @@ ng generate component # Gerar componente
 ### Docker
 ```bash
 # Desenvolvimento
+docker-compose up vigilancia-front-dev
+
+# Produção
+docker-compose up vigilancia-front-prod
+
+# Build customizado
+docker build --build-arg BUILD_ENV=production -t vigilancia-front .
+```lvimento
 docker-compose up vigilancia-front-dev
 
 # Produção

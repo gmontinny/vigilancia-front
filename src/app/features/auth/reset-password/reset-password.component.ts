@@ -1,7 +1,13 @@
-import { Component, OnInit, OnDestroy, Renderer2, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule, DOCUMENT } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { AUTH_CONSTANTS, ROUTES } from '../../../core/constants/auth.constants';
+import { RecaptchaService } from '../../../core/services/recaptcha.service';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-reset-password',
@@ -19,54 +25,91 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   private backgroundInterval: any;
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private renderer: Renderer2,
-    @Inject(DOCUMENT) private document: Document
+    private readonly fb: FormBuilder,
+    private readonly router: Router,
+    private readonly http: HttpClient,
+    private readonly recaptchaService: RecaptchaService,
+    @Inject(DOCUMENT) private readonly document: Document
   ) {
     this.document.body.classList.add('authentication-background');
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.createForm();
     this.startBackgroundRotation();
+    this.loadRecaptcha();
   }
 
-  ngOnDestroy() {
-    this.document.body.classList.remove('authentication-background');
-    if (this.backgroundInterval) {
-      clearInterval(this.backgroundInterval);
-    }
+  ngOnDestroy(): void {
+    this.cleanupResources();
   }
 
-  createForm() {
+  private createForm(): void {
     this.resetForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
   }
 
-  startBackgroundRotation() {
+  private startBackgroundRotation(): void {
     this.backgroundInterval = setInterval(() => {
       this.currentBackground = this.currentBackground === 1 ? 2 : 1;
       this.document.body.style.backgroundImage = `url('/assets/images/background-0${this.currentBackground}.png')`;
-    }, 10000);
+    }, AUTH_CONSTANTS.BACKGROUND_ROTATION_INTERVAL);
     
     this.document.body.style.backgroundImage = `url('/assets/images/background-01.png')`;
   }
 
-  onSubmit() {
-    if (this.resetForm.valid) {
-      this.isLoading = true;
-      this.errorMessage = '';
-      
-      setTimeout(() => {
-        this.isLoading = false;
-        this.successMessage = 'Email de redefinição enviado com sucesso!';
-      }, 2000);
-    }
+  private loadRecaptcha(): void {
+    this.recaptchaService.loadRecaptcha().catch(error => {
+      console.error('Erro ao carregar reCAPTCHA:', error);
+      this.errorMessage = 'Erro ao carregar sistema de segurança.';
+    });
   }
 
-  goToLogin() {
-    this.router.navigate(['/login']);
+  private cleanupResources(): void {
+    this.document.body.classList.remove('authentication-background');
+    if (this.backgroundInterval) {
+      clearInterval(this.backgroundInterval);
+    }
+    this.recaptchaService.removeRecaptcha();
+  }
+
+  onSubmit(): void {
+    if (!this.resetForm.valid) {
+      this.resetForm.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    
+    this.recaptchaService.executeRecaptcha('forgot_password')
+      .then(token => {
+        const payload = { email: this.resetForm.value.email };
+        
+        this.http.post(`${environment.apiBaseUrl}${environment.endpoints.auth.forgotPassword}`, payload)
+          .pipe(
+            finalize(() => this.isLoading = false),
+            catchError(error => {
+              this.errorMessage = error?.error?.message || 'Erro ao enviar email. Tente novamente.';
+              console.error('Erro ao enviar email:', error);
+              return of(null);
+            })
+          )
+          .subscribe(response => {
+            this.successMessage = 'Email de redefinição enviado com sucesso! Verifique sua caixa de entrada.';
+            this.resetForm.reset();
+          });
+      })
+      .catch(error => {
+        this.isLoading = false;
+        this.errorMessage = 'Erro na verificação de segurança. Tente novamente.';
+        console.error('Erro no reCAPTCHA:', error);
+      });
+  }
+
+  goToLogin(): void {
+    this.router.navigate([ROUTES.LOGIN]);
   }
 }

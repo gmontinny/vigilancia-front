@@ -8,7 +8,7 @@ export const environment = {
   endpoints: {
     auth: {
       login: '/api/auth/login',
-      resetPassword: '/api/auth/reset-password',
+      forgotPassword: '/auth/password/forgot',
       newPassword: '/api/auth/new-password',
       refresh: '/api/auth/refresh',
       preCadastro: '/auth/pre-cadastro'
