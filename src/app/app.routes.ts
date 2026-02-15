@@ -4,6 +4,7 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { ResetPasswordComponent } from './features/auth/reset-password/reset-password.component';
 import { NewPasswordComponent } from './features/auth/new-password/new-password.component';
 import { RegisterComponent } from './features/auth/register/register.component';
+import { DashboardComponent } from './features/dashboard/dashboard.component';
 
 export const routes: Routes = [
   {
@@ -29,7 +30,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    component: LoginComponent, // Temporário
+    component: DashboardComponent,
     canActivate: [authGuard]
   }
 ];

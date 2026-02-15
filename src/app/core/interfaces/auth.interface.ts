@@ -1,34 +1,26 @@
-export interface LoginRequest {
-  username: string;
-  password: string;
+export interface AuthResponse {
+  token: string;
+  tokenType: string;
+  expiresIn: number;
+  userId: number;
+  email: string;
+  authorities: string[];
 }
 
-export interface LoginResponse {
-  token: string;
-  refreshToken: string;
-  user: User;
+export interface LoginRequest {
+  email?: string;
+  cpf?: string;
+  senha: string;
+}
+
+export interface UserInfo {
+  tokenType: string;
+  email: string;
+  authorities: string[];
 }
 
 export interface User {
-  id: number;
-  username: string;
-  nome?: string;
+  userId: number;
   email: string;
-  roles: string[];
-}
-
-export interface ResetPasswordRequest {
-  email: string;
-}
-
-export interface NewPasswordRequest {
-  token: string;
-  password: string;
-  confirmPassword: string;
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message: string;
+  authorities: string[];
 }

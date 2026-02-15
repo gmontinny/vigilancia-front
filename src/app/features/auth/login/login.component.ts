@@ -2,11 +2,7 @@ import { Component, OnInit, OnDestroy, Renderer2, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { AppState } from '../../../store/app.state';
-import * as AuthActions from '../../../store/auth/auth.actions';
-import * as AuthSelectors from '../../../store/auth/auth.selectors';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -18,27 +14,25 @@ import * as AuthSelectors from '../../../store/auth/auth.selectors';
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   showPassword = false;
-  isLoading$: Observable<boolean>;
-  errorMessage$: Observable<string | null>;
+  isLoading = false;
+  errorMessage = '';
   private backgroundInterval: any;
   currentBackground = 1;
 
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
-    private readonly store: Store<AppState>,
+    private readonly authService: AuthService,
     private readonly renderer: Renderer2,
     @Inject(DOCUMENT) private readonly document: Document
   ) {
     this.document.body.classList.add('authentication-background');
-    this.isLoading$ = this.store.select(AuthSelectors.selectAuthLoading);
-    this.errorMessage$ = this.store.select(AuthSelectors.selectAuthError);
   }
 
   ngOnInit(): void {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(5)]]
     });
     
     this.startBackgroundRotation();
@@ -49,7 +43,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (this.backgroundInterval) {
       clearInterval(this.backgroundInterval);
     }
-    this.store.dispatch(AuthActions.clearError());
   }
 
   private startBackgroundRotation(): void {
@@ -58,7 +51,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.document.body.style.backgroundImage = `url('/assets/images/background-0${this.currentBackground}.png')`;
     }, 10000);
     
-    // Define background inicial
     this.document.body.style.backgroundImage = `url('/assets/images/background-01.png')`;
   }
 
@@ -68,16 +60,37 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      this.store.dispatch(AuthActions.login({ credentials: this.loginForm.value }));
-    } else {
-      this.markFormGroupTouched();
-    }
-  }
+      this.isLoading = true;
+      this.errorMessage = '';
 
-  private markFormGroupTouched(): void {
-    Object.keys(this.loginForm.controls).forEach(key => {
-      this.loginForm.get(key)?.markAsTouched();
-    });
+      const username = this.loginForm.value.username;
+      const isEmail = username.includes('@');
+      
+      const credentials: any = {
+        senha: this.loginForm.value.password
+      };
+
+      if (isEmail) {
+        credentials.email = username;
+      } else {
+        credentials.cpf = username;
+      }
+
+      this.authService.login(credentials).subscribe({
+        next: async () => {
+          this.isLoading = false;
+          await this.router.navigate(['/dashboard']);
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = error.error?.message || 'Usuário ou senha inválidos';
+        }
+      });
+    } else {
+      Object.keys(this.loginForm.controls).forEach(key => {
+        this.loginForm.get(key)?.markAsTouched();
+      });
+    }
   }
 
   goToResetPassword(event: Event): void {

@@ -7,10 +7,11 @@ export const environment = {
   },
   endpoints: {
     auth: {
-      login: '/api/auth/login',
+      login: '/auth/login',
+      refresh: '/auth/refresh',
+      me: '/auth/me',
       forgotPassword: '/auth/password/forgot',
       newPassword: '/api/auth/new-password',
-      refresh: '/api/auth/refresh',
       preCadastro: '/auth/pre-cadastro'
     },
     usuarios: '/usuarios'

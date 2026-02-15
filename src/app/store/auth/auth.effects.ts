@@ -22,7 +22,11 @@ export class AuthEffects {
         this.authService.login(credentials).pipe(
           map((response) =>
             AuthActions.loginSuccess({
-              user: response.user,
+              user: {
+                userId: response.userId,
+                email: response.email,
+                authorities: response.authorities
+              },
               token: response.token
             })
           ),

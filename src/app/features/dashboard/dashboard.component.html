@@ -1,0 +1,141 @@
+<div class="main-content app-content">
+  <div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
+      <div>
+        <h1 class="page-title fw-semibold fs-20 mb-0">Sistema de Vigilância</h1>
+        <p class="fs-13 text-muted mb-0">Bem-vindo ao sistema</p>
+      </div>
+      <div class="ms-md-auto">
+        <button class="btn btn-danger" (click)="logout()">
+          <i class="ri-logout-box-line me-2"></i>Sair
+        </button>
+      </div>
+    </div>
+    <!-- End Page Header -->
+
+    <!-- Row -->
+    <div class="row">
+      <div class="col-xl-12">
+        <div class="card custom-card">
+          <div class="card-header">
+            <div class="card-title">Dashboard Principal</div>
+          </div>
+          <div class="card-body">
+            <div class="text-center py-5">
+              <img src="assets/images/logo_visa.png" alt="Vigilância" width="150" height="142" class="img-fluid mb-4">
+              <h3 class="mb-3">Bem-vindo, {{ userName }}!</h3>
+              <p class="text-muted mb-4">{{ userEmail }}</p>
+              <div class="alert alert-success" role="alert">
+                <i class="ri-checkbox-circle-line me-2"></i>
+                Você está autenticado no sistema de vigilância
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Row -->
+
+    <!-- Statistics Row -->
+    <div class="row">
+      <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+        <div class="card custom-card">
+          <div class="card-body">
+            <div class="d-flex align-items-top">
+              <div class="me-3">
+                <span class="avatar avatar-md avatar-rounded" style="background-color: #00A859;">
+                  <i class="ri-user-line fs-18"></i>
+                </span>
+              </div>
+              <div class="flex-fill">
+                <div class="d-flex mb-1 align-items-top justify-content-between">
+                  <h6 class="mb-0 fw-semibold">Usuários</h6>
+                </div>
+                <div class="d-flex align-items-end justify-content-between">
+                  <div>
+                    <p class="mb-0 fs-20 fw-semibold">--</p>
+                    <span class="fs-12 text-muted">Total de usuários</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+        <div class="card custom-card">
+          <div class="card-body">
+            <div class="d-flex align-items-top">
+              <div class="me-3">
+                <span class="avatar avatar-md avatar-rounded" style="background-color: #00A859;">
+                  <i class="ri-building-line fs-18"></i>
+                </span>
+              </div>
+              <div class="flex-fill">
+                <div class="d-flex mb-1 align-items-top justify-content-between">
+                  <h6 class="mb-0 fw-semibold">Estabelecimentos</h6>
+                </div>
+                <div class="d-flex align-items-end justify-content-between">
+                  <div>
+                    <p class="mb-0 fs-20 fw-semibold">--</p>
+                    <span class="fs-12 text-muted">Total cadastrados</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+        <div class="card custom-card">
+          <div class="card-body">
+            <div class="d-flex align-items-top">
+              <div class="me-3">
+                <span class="avatar avatar-md avatar-rounded" style="background-color: #00A859;">
+                  <i class="ri-file-list-line fs-18"></i>
+                </span>
+              </div>
+              <div class="flex-fill">
+                <div class="d-flex mb-1 align-items-top justify-content-between">
+                  <h6 class="mb-0 fw-semibold">Licenças</h6>
+                </div>
+                <div class="d-flex align-items-end justify-content-between">
+                  <div>
+                    <p class="mb-0 fs-20 fw-semibold">--</p>
+                    <span class="fs-12 text-muted">Licenças ativas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+        <div class="card custom-card">
+          <div class="card-body">
+            <div class="d-flex align-items-top">
+              <div class="me-3">
+                <span class="avatar avatar-md avatar-rounded" style="background-color: #00A859;">
+                  <i class="ri-shield-check-line fs-18"></i>
+                </span>
+              </div>
+              <div class="flex-fill">
+                <div class="d-flex mb-1 align-items-top justify-content-between">
+                  <h6 class="mb-0 fw-semibold">Fiscalizações</h6>
+                </div>
+                <div class="d-flex align-items-end justify-content-between">
+                  <div>
+                    <p class="mb-0 fs-20 fw-semibold">--</p>
+                    <span class="fs-12 text-muted">Total realizadas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Statistics Row -->
+  </div>
+</div>

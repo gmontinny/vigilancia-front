@@ -26,8 +26,8 @@ Acesse: `http://localhost:4200` (dev) ou `http://localhost` (prod)
 ## 🔐 Autenticação
 
 **Credenciais de teste:**
-- Usuário: `admin`
-- Senha: `123456`
+- Email: `admin@local` ou CPF: `123.456.789-00`
+- Senha: `admin` (mínimo 5 caracteres)
 
 **Funcionalidades:**
 - Login com validação de formulário
@@ -41,14 +41,16 @@ Acesse: `http://localhost:4200` (dev) ou `http://localhost` (prod)
 src/app/
 ├── core/                   # Serviços e guards singleton
 │   ├── services/
-│   │   ├── auth.service.ts      # Autenticação e pré-cadastro
+│   │   ├── auth.service.ts      # Autenticação JWT (login, refresh, me)
 │   │   ├── usuario.service.ts
 │   │   ├── recaptcha.service.ts  # Serviço reCAPTCHA v3
 │   │   ├── storage.service.ts    # Persistência localStorage/IndexedDB
 │   │   ├── preferences.service.ts # Preferências do usuário
 │   │   └── form-draft.service.ts  # Rascunhos de formulários
 │   ├── guards/
-│   │   └── auth.guard.ts         # Guard com NgRx selectors
+│   │   └── auth.guard.ts         # Guard assíncrono
+│   ├── interceptors/
+│   │   └── auth.interceptor.ts   # Token JWT e refresh automático
 │   ├── interfaces/         # Tipagem TypeScript
 │   │   └── auth.interface.ts
 │   ├── types/              # TypeScript Avançado
@@ -67,11 +69,12 @@ src/app/
 │       ├── auth.selectors.ts # Selectors memoizados
 │       └── index.ts        # Barrel exports
 ├── features/               # Módulos por funcionalidade
-│   └── auth/
-│       ├── login/          # Tela de login com NgRx
-│       ├── reset-password/ # Solicitação de reset
-│       ├── new-password/   # Definição de nova senha
-│       └── register/       # Cadastro de usuário
+│   ├── auth/
+│   │   ├── login/          # Tela de login com NgRx
+│   │   ├── reset-password/ # Solicitação de reset
+│   │   ├── new-password/   # Definição de nova senha
+│   │   └── register/       # Cadastro de usuário
+│   └── dashboard/          # Dashboard principal do sistema
 ├── shared/                 # Componentes reutilizáveis
 │   ├── models/            # Interfaces e tipos
 │   │   └── usuario.model.ts
@@ -90,15 +93,28 @@ src/app/
 ## 🛠️ Funcionalidades
 
 ### ✅ Autenticação
+- **Login JWT**: Email ou CPF com detecção automática
+- **Refresh Token**: Renovação automática antes de expirar (5 min)
+- **Interceptor HTTP**: Adiciona token automaticamente em todas as requisições
+- **Persistência**: Token em localStorage, dados em IndexedDB
+- **Expiração**: Controle de TTL com validação automática
+- **AuthGuard**: Proteção de rotas com verificação de token persistido
 - Tela de login com logo personalizado (150x142px)
 - **Formulário de reset de senha**: Solicita link por email com reCAPTCHA v3 (sempre retorna 200)
 - **Formulário de nova senha**: Recebe token via query param, valida e redefine senha
 - **Cadastro de usuário** com validações brasileiras e reCAPTCHA v3
 - Validador customizado para senhas coincidentes
-- Validação de senhas (mínimo 6 caracteres)
+- Validação de senhas (mínimo 5 caracteres)
 - Toggle de visualização de senha em todos os campos
 - Navegação SPA entre login, reset, nova senha e cadastro
 - Validação de token antes do envio (new-password)
+
+### ✅ Dashboard
+- **Tela principal**: Dashboard após autenticação
+- **Informações do usuário**: Exibe email e nome extraído
+- **Cards de estatísticas**: Usuários, Estabelecimentos, Licenças, Fiscalizações
+- **Botão de logout**: Encerra sessão e redireciona para login
+- **Persistência de sessão**: Mantém autenticação após F5
 
 ### ✅ Cadastro de Usuário
 - **Campos obrigatórios**: Nome, CPF, Email, Celular, Sexo, Senha, Confirmar Senha
@@ -155,11 +171,19 @@ src/app/
 - URL: `https://api.vigilancia.com.br` (a definir)
 
 **Endpoints configurados:**
-- `/api/auth/login` - Autenticação
+- `/auth/login` - Autenticação JWT (POST: `{email, senha}` ou `{cpf, senha}`)
+- `/auth/refresh` - Renovar token JWT (POST com Bearer token)
+- `/auth/me` - Dados do usuário autenticado (GET com Bearer token)
 - `/auth/password/forgot` - Solicitação de reset (POST: `{email}`, sempre retorna 200)
 - `/auth/password/reset` - Redefinição de senha (POST: `{token, novaSenha}`)
-- `/api/auth/refresh` - Refresh token
 - `/auth/pre-cadastro` - Pré-cadastro de usuário (multipart/form-data)
+
+**Regras de Autenticação:**
+- Backend aceita **email** (`{email, senha}`) ou **CPF** (`{cpf, senha}`)
+- Frontend detecta automaticamente se é email (contém @) ou CPF
+- CPF aceita com ou sem máscara (123.456.789-00 ou 12345678900)
+- Validação de senha com BCrypt
+- Retorna JWT com expiração de 1 hora (3600s)
 
 **Fluxo de Reset de Senha:**
 1. Usuário informa email em `/reset-password`

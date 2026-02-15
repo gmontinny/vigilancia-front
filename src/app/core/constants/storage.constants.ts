@@ -4,7 +4,8 @@ export const STORAGE_KEYS = {
   USER_PREFERENCES: 'user_preferences',
   FORM_DRAFT: 'form_draft',
   THEME: 'theme',
-  LANGUAGE: 'language'
+  LANGUAGE: 'language',
+  TOKEN_EXPIRY: 'token_expiry'
 } as const;
 
 export const STORAGE_TTL = {
